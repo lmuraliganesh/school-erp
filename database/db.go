@@ -53,3 +53,58 @@ func InitUserTable() {
 
 	fmt.Println("Users table checked/created successfully!")
 }
+
+func InitClassTable() {
+	query := `
+	CREATE TABLE IF NOT EXISTS classes (
+		id SERIAL PRIMARY KEY,
+		name VARCHAR(100) NOT NULL,
+		section VARCHAR(10) NOT NULL,
+		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+	);
+	`
+
+	_, err := DB.Exec(context.Background(), query)
+	if err != nil {
+		log.Fatalf("Failed to create classes table: %v\n", err)
+	}
+
+	fmt.Println("Classes table checked/created successfully!")
+}
+
+func InitSubjectTable() {
+	query := `
+	CREATE TABLE IF NOT EXISTS subjects (
+		id SERIAL PRIMARY KEY,
+		name VARCHAR(100) NOT NULL,
+		code VARCHAR(10) NOT NULL,
+		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+	);
+	`
+
+	_, err := DB.Exec(context.Background(), query)
+	if err != nil {
+		log.Fatalf("Failed to create subjects table: %v\n", err)
+	}
+	fmt.Println("Subjects table checked/created successfully!")
+
+}
+
+func InitStudentProfileTable() {
+	query := `
+CREATE TABLE IF NOT EXISTS student_profiles(
+id SERIAL PRIMARY KEY,
+user_id INTEGER NOT NULL REFERENCES users(id),
+class_id INTEGER NOT NULL REFERENCES classes(id),
+roll_number VARCHAR(20) NOT NULL,
+created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+`
+
+	_, err := DB.Exec(context.Background(), query)
+	if err != nil {
+		log.Fatalf("Failed to create student profile table: %v\n", err)
+	}
+	fmt.Println("Student profiles table checked/created successfully!")
+
+}

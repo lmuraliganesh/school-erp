@@ -26,6 +26,9 @@ func main() {
 	// Connect to PostgreSQL and initialize tables
 	database.ConnectDB()
 	database.InitUserTable()
+	database.InitClassTable()
+	database.InitSubjectTable()
+	database.InitStudentProfileTable()
 
 	// Initialize Chi router
 	r := chi.NewRouter()
@@ -41,6 +44,8 @@ func main() {
 	r.Use(chimw.Recoverer)
 	r.With(appmw.AuthMiddleware, appmw.AdminOnlyMiddleware).Post("/api/users", handlers.CreateUserHandler)
 	r.With(appmw.AuthMiddleware, appmw.AdminOnlyMiddleware).Get("/api/users", handlers.GetUsersHandler)
+	r.With(appmw.AuthMiddleware, appmw.AdminOnlyMiddleware).Post("/api/classes", handlers.CreateClassHandler)
+	r.With(appmw.AuthMiddleware, appmw.AdminOnlyMiddleware).Post("/api/subjects", handlers.CreateSubjectHandler)
 	r.Post("/api/login", handlers.LoginHandler)
 
 	// Health check endpoint
