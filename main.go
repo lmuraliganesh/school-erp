@@ -46,6 +46,7 @@ func main() {
 	r.With(appmw.AuthMiddleware, appmw.AdminOnlyMiddleware).Get("/api/users", handlers.GetUsersHandler)
 	r.With(appmw.AuthMiddleware, appmw.AdminOnlyMiddleware).Post("/api/classes", handlers.CreateClassHandler)
 	r.With(appmw.AuthMiddleware, appmw.AdminOnlyMiddleware).Post("/api/subjects", handlers.CreateSubjectHandler)
+	r.With(appmw.AuthMiddleware, appmw.AdminOnlyMiddleware).Post("/api/students", handlers.EnrollStudentHandler)
 	r.Post("/api/login", handlers.LoginHandler)
 
 	// Health check endpoint
