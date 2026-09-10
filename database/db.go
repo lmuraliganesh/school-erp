@@ -128,3 +128,20 @@ created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 	}
 	fmt.Println("Timetables checked/created successfully!")
 }
+
+func InitAnnouncementTable() {
+	query := `
+	CREATE TABLE IF NOT EXISTS announcements(
+	id SERIAL PRIMARY KEY,
+	title VARCHAR(100) NOT NULL,
+	content TEXT NOT NULL,
+	author_id INTEGER NOT NULL REFERENCES users(id),
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+	);
+	`
+	_, err := DB.Exec(context.Background(), query)
+	if err != nil {
+		log.Fatalf("Failed to create Announcement table: %v\n", err)
+	}
+	fmt.Println("Announcement checked/created successfully!")
+}
