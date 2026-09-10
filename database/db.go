@@ -108,3 +108,23 @@ created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 	fmt.Println("Student profiles table checked/created successfully!")
 
 }
+
+func InitTimetableTable() {
+	query := `
+CREATE TABLE IF NOT EXISTS timetables(
+id SERIAL PRIMARY KEY,
+class_id INTEGER NOT NULL REFERENCES classes(id),
+subject_id INTEGER NOT NULL REFERENCES subjects(id),
+day_of_week VARCHAR(20) NOT NULL,
+start_time TIME NOT NULL,
+end_time TIME NOT NULL,
+created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+
+);
+`
+	_, err := DB.Exec(context.Background(), query)
+	if err != nil {
+		log.Fatalf("Failed to create time table: %v\n", err)
+	}
+	fmt.Println("Timetables checked/created successfully!")
+}

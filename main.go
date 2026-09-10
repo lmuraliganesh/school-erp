@@ -29,6 +29,7 @@ func main() {
 	database.InitClassTable()
 	database.InitSubjectTable()
 	database.InitStudentProfileTable()
+	database.InitTimetableTable()
 
 	// Initialize Chi router
 	r := chi.NewRouter()
@@ -47,6 +48,9 @@ func main() {
 	r.With(appmw.AuthMiddleware, appmw.AdminOnlyMiddleware).Post("/api/classes", handlers.CreateClassHandler)
 	r.With(appmw.AuthMiddleware, appmw.AdminOnlyMiddleware).Post("/api/subjects", handlers.CreateSubjectHandler)
 	r.With(appmw.AuthMiddleware, appmw.AdminOnlyMiddleware).Post("/api/students", handlers.EnrollStudentHandler)
+	r.With(appmw.AuthMiddleware, appmw.AdminOnlyMiddleware).Get("/api/students", handlers.GetStudentsHandler)
+	r.With(appmw.AuthMiddleware, appmw.AdminOnlyMiddleware).Post("/api/timetables", handlers.CreateTimetableHandler)
+	r.With(appmw.AuthMiddleware, appmw.AdminOnlyMiddleware).Get("/api/timetables", handlers.GetTimetableHandler)
 	r.Post("/api/login", handlers.LoginHandler)
 
 	// Health check endpoint

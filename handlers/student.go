@@ -37,3 +37,49 @@ func EnrollStudentHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(response)
 
 }
+
+func GetStudentsHandler(w http.ResponseWriter, r *http.Request) {
+	query := `
+	SELECT 
+		student_profiles.id,
+		users.name,
+		users.email,
+		classes.name AS class_name,
+		classes.section,
+		student_profiles.roll_number
+	FROM student_profiles
+	JOIN users ON student_profiles.user_id = users.id
+	JOIN classes ON student_profiles.class_id = classes.id
+	ORDER BY student_profiles.id
+	`
+
+	rows, err := database.DB.Query(context.Background(), query)
+	if err != nil {
+		http.Error(w, "Failed to fetch students", http.StatusInternalServerError)
+		return
+	}
+	defer rows.Close()
+
+	var students []models.StudentDirectoryEntry
+	for rows.Next() {
+		var s models.StudentDirectoryEntry
+		err := rows.Scan(&s.ID, &s.Name, &s.Email, &s.ClassName, &s.Section, &s.RollNumber)
+		if err != nil {
+			http.Error(w, "Failed to parse student data", http.StatusInternalServerError)
+			return
+		}
+		students = append(students, s)
+	}
+
+	if err = rows.Err(); err != nil {
+		http.Error(w, "Error reading student records", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(w).Encode(students); err != nil {
+		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+		return
+	}
+}
