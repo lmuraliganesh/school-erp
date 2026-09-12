@@ -145,3 +145,20 @@ func InitAnnouncementTable() {
 	}
 	fmt.Println("Announcement checked/created successfully!")
 }
+
+func InitAttendanceTable() {
+	query := `
+	CREATE TABLE IF NOT EXISTS attendance(
+	id SERIAL PRIMARY KEY,
+	student_id INTEGER NOT NULL REFERENCES users(id),
+	date DATE NOT NULL,
+	status VARCHAR(10) NOT NULL CHECK (status IN ('present', 'absent')),
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+	);`
+	//DB.Exec + error handling + print statement
+	_, err := DB.Exec(context.Background(), query)
+	if err != nil {
+		log.Fatalf("Failed to mark the attendance table:%v\n", err)
+	}
+	fmt.Println("Attendance marked checked/successfully")
+}
