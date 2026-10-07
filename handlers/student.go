@@ -41,7 +41,7 @@ func EnrollStudentHandler(w http.ResponseWriter, r *http.Request) {
 func GetStudentsHandler(w http.ResponseWriter, r *http.Request) {
 	query := `
 	SELECT 
-		student_profiles.id,
+		student_profiles.id,student_profiles.user_id,student_profiles.class_id,
 		users.name,
 		users.email,
 		classes.name AS class_name,
@@ -63,7 +63,7 @@ func GetStudentsHandler(w http.ResponseWriter, r *http.Request) {
 	var students []models.StudentDirectoryEntry
 	for rows.Next() {
 		var s models.StudentDirectoryEntry
-		err := rows.Scan(&s.ID, &s.Name, &s.Email, &s.ClassName, &s.Section, &s.RollNumber)
+		err := rows.Scan(&s.ID, &s.UserID, &s.ClassID, &s.Name, &s.Email, &s.ClassName, &s.Section, &s.RollNumber)
 		if err != nil {
 			http.Error(w, "Failed to parse student data", http.StatusInternalServerError)
 			return

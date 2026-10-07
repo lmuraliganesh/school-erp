@@ -4,10 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"strconv"
 	"time"
 
 	"school-erp/database"
+	appmw "school-erp/middleware"
 	"school-erp/models"
+	"school-erp/utils"
 
 	"github.com/go-chi/chi/v5"
 )
@@ -21,7 +24,11 @@ func MarkAttendanceHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for _, entry := range req.Students {
-		query := `INSERT INTO attendance(student_id, date, status) VALUES ($1,$2,$3)`
+		query := `INSERT INTO attendance(student_id, date, status) 
+		VALUES ($1,$2,$3)
+		ON CONFLICT (student_id, date)
+		DO UPDATE SET status = EXCLUDED.status
+		`
 		_, err := database.DB.Exec(context.Background(), query, entry.StudentID, req.Date, entry.Status)
 		if err != nil {
 			http.Error(w, "Failed to mark attendance for student", http.StatusInternalServerError)
@@ -39,6 +46,17 @@ func MarkAttendanceHandler(w http.ResponseWriter, r *http.Request) {
 }
 func GetStudentAttendanceHandler(w http.ResponseWriter, r *http.Request) {
 	studentID := chi.URLParam(r, "id")
+	claims, ok := r.Context().Value(appmw.UserContextKey).(*utils.Claims)
+	if !ok {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+	if claims.Role != "admin" && claims.Role != "teacher" {
+		if strconv.Itoa(claims.UserID) != studentID {
+			http.Error(w, "You can only view your own attendance", http.StatusForbidden)
+			return
+		}
+	}
 
 	query := `SELECT id, student_id, date, status, created_at FROM attendance WHERE student_id = $1 ORDER BY date`
 	rows, err := database.DB.Query(context.Background(), query, studentID)
