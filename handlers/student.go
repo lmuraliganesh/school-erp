@@ -21,6 +21,7 @@ func EnrollStudentHandler(w http.ResponseWriter, r *http.Request) {
 	query := `INSERT INTO student_profiles(user_id, class_id, roll_number) VALUES ($1,$2,$3) RETURNING id`
 	err = database.DB.QueryRow(context.Background(), query, req.UserID, req.ClassID, req.RollNumber).Scan(&newID)
 	if err != nil {
+
 		http.Error(w, "Failed to enroll student (check user_id/class_id are valid)", http.StatusBadRequest)
 		return
 	}
@@ -32,7 +33,7 @@ func EnrollStudentHandler(w http.ResponseWriter, r *http.Request) {
 		ClassID:    req.ClassID,
 		RollNumber: req.RollNumber,
 	}
-	w.Header().Set("Content type", "application/json")
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(response)
 
